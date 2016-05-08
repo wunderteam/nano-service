@@ -1,14 +1,6 @@
-require 'rails_helper'
+require 'spec_helper'
 
-module MockService
-  include NanoService::Base
-
-  private
-
-  def private_foo
-    'bar'
-  end
-end
+MockService.logger = Logger.new('/dev/null')
 
 describe NanoService::Base do
   describe 'method proxy' do
