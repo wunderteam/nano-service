@@ -2,3 +2,7 @@
 
 # NanoService Prototype
 A thin module wrapper for helping enforce service boundaries.
+
+# TODO
+- additional test coverage for dynamic exception definition
+- explore options for more flexible exception mapping

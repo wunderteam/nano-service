@@ -1,4 +1,4 @@
 module MockService
-  class Error < NanoService::Error
+  class CustomError < NanoService::Error
   end
 end
