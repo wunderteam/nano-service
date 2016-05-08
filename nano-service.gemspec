@@ -1,10 +1,11 @@
+# coding: utf-8
 $LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require "nano-service/version"
 
 Gem::Specification.new do |s|
   s.name        = 'nano-service'
   s.version     = NanoService::VERSION
-  s.licenses    = ['MIT']
+  s.license     = "MIT"
   s.authors     = ['Dave Riess']
   s.email       = ['dave@wundercapital.com']
   s.homepage    = 'https://github.com/wunderteam/nano-service'
