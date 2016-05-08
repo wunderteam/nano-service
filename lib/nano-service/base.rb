@@ -57,7 +57,11 @@ module NanoService
       end
 
       def logger
-        @logger ||= Rails.logger
+        @logger ||= defined?(Rails) ? Rails.logger : Logger.new(STDOUT)
+      end
+
+      def logger=(logger)
+        @logger = logger
       end
     end
   end
