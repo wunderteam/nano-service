@@ -2,10 +2,10 @@ require 'active_support'
 require 'active_record'
 require 'globalid'
 
-require_relative 'nano-service/base'
-require_relative 'nano-service/error_serializer'
-require_relative 'nano-service/exceptions'
-require_relative 'nano-service/version'
+require 'nano-service/error_serializer'
+require 'nano-service/exceptions'
+require 'nano-service/version'
+require 'nano-service/base'
 
 module NanoService
 end

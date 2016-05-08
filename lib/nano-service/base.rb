@@ -5,9 +5,13 @@ module NanoService
     # dynamically define NanoService exceptions on the including Service module
     included do
       @namespace = Kernel.const_get(name.split('::')[0])
-      exceptions = NanoService.constants.select { |c| NanoService.const_get(c) < StandardError }
 
-      (exceptions - @namespace.constants).each do |e|
+      nano_service_exceptions = NanoService.constants.select do |c|
+        klass = NanoService.const_get(c)
+        (klass.class === Class) && (klass < StandardError)
+      end
+
+      (nano_service_exceptions - @namespace.constants).each do |e|
         @namespace.const_set(e, NanoService.const_get(e))
       end
     end
