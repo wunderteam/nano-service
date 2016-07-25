@@ -24,7 +24,14 @@ module NanoService
       def method_missing(method_name, *args, &block)
         if instance_methods.include?(method_name)
           begin
-            caller_object.send(method_name, *args)
+            res = caller_object.send(method_name, *args)
+            if res.is_a?(Hash)
+              res.with_indifferent_access
+            elsif res.is_a?(Array)
+              res.map { |item| item.is_a?(Hash) ? item.with_indifferent_access : item }
+            else
+              res
+            end
           rescue Exception => e
             handle_exception(e)
           end
