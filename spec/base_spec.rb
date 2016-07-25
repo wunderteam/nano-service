@@ -12,6 +12,14 @@ describe NanoService::Base do
     it 'does not proxy private instance methods through class method_missing' do
       expect { MockService.private_foo }.to raise_error(NoMethodError)
     end
+
+    it 'coerces return Hashes to HashWithIndifferentAccess' do
+      expect(MockService.return_a_hash.class).to eq(HashWithIndifferentAccess)
+    end
+
+    it 'coerces return array of Hashes to array of HashWithIndifferentAccess' do
+      expect(MockService.return_an_array_of_hashes.first.class).to eq(HashWithIndifferentAccess)
+    end
   end
 
   describe 'exception handling' do
