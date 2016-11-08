@@ -22,6 +22,23 @@ describe NanoService::Base do
     end
   end
 
+  describe 'test mode' do
+    describe 'proxies methods to Test[service_module_name]' do
+      it do
+        expect(MockService.test_mode?).to be_falsy
+
+        MockService.test_mode = true
+        expect_any_instance_of(TestMockService).to receive(:return_a_hash).once
+        MockService.return_a_hash
+
+        MockService.test_mode = false
+        expect_any_instance_of(MockService).to receive(:return_a_hash).once
+        expect_any_instance_of(TestMockService).not_to receive(:return_a_hash)
+        MockService.return_a_hash
+      end
+    end
+  end
+
   describe 'exception handling' do
     it 'passes exception to handle_exception' do
       allow_any_instance_of(MockService).to receive(:exception!) { raise StandardError }
