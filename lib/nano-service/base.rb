@@ -24,7 +24,7 @@ module NanoService
       def method_missing(method_name, *args, &block)
         if instance_methods.include?(method_name)
           begin
-            res = caller_object.send(method_name, *args)
+            res = (test_mode? ? test_caller_object : caller_object).send(method_name, *args)
             if res.is_a?(Hash)
               res.with_indifferent_access
             elsif res.is_a?(Array)
@@ -69,6 +69,24 @@ module NanoService
 
       def logger=(logger)
         @logger = logger
+      end
+
+      def test_mode=(value)
+        @test_mode = value
+      end
+
+      def test_mode?
+        @test_mode
+      end
+
+      def test_caller_object
+        @test_caller_object ||= begin
+          path     = name.split('::')
+          obj_name = "Test#{path.pop}"
+          klass    = (path.any? ? path.join('::').constantize : Kernel).const_get(obj_name)
+
+          Class.new.extend(klass)
+        end
       end
     end
   end
