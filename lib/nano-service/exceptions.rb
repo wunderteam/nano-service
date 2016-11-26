@@ -22,4 +22,7 @@ module NanoService
 
   class InvalidGlobalID < Error
   end
+
+  class TestInterfaceNotRegistered < Error
+  end
 end

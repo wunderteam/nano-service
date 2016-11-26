@@ -1,4 +1,4 @@
-module TestMockService
+module MyServiceMock
   def return_a_hash
     {}
   end

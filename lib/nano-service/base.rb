@@ -17,14 +17,10 @@ module NanoService
     end
 
     module ClassMethods
-      def caller_object
-        @caller_object ||= Class.new.extend(self)
-      end
-
       def method_missing(method_name, *args, &block)
         if instance_methods.include?(method_name)
           begin
-            res = (test_mode? ? test_caller_object : caller_object).send(method_name, *args)
+            res = caller_object.send(method_name, *args)
             if res.is_a?(Hash)
               res.with_indifferent_access
             elsif res.is_a?(Array)
@@ -76,16 +72,25 @@ module NanoService
       end
 
       def test_mode?
-        @test_mode
+        @test_mode == true
       end
 
-      def test_caller_object
-        @test_caller_object ||= begin
-          path     = name.split('::')
-          obj_name = "Test#{path.pop}"
-          klass    = (path.any? ? path.join('::').constantize : Kernel).const_get(obj_name)
+      def test_interface
+        raise TestInterfaceNotRegistered unless @test_interface
+        @test_interface
+      end
 
-          Class.new.extend(klass)
+      private
+
+      def register_test_interface(klass)
+        @test_interface = klass
+      end
+
+      def caller_object
+        if test_mode?
+          @test_caller_object ||= Class.new.extend(test_interface)
+        else
+          @caller_object ||= Class.new.extend(self)
         end
       end
     end
