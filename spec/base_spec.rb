@@ -1,121 +1,149 @@
 require 'spec_helper'
 
-MockService.logger = Logger.new('/dev/null')
+MyService.logger = Logger.new('/dev/null')
 
 describe NanoService::Base do
+  assert_mock_service_parity(MyService)
+
   describe 'method proxy' do
     it 'proxies instance methods through class method_missing' do
-      allow_any_instance_of(MockService).to receive(:foo) { 'bar' }
-      expect(MockService.foo).to eq('bar')
+      allow_any_instance_of(MyService).to receive(:foo) { 'bar' }
+      expect(MyService.foo).to eq('bar')
     end
 
     it 'does not proxy private instance methods through class method_missing' do
-      expect { MockService.private_foo }.to raise_error(NoMethodError)
+      expect { MyService.private_foo }.to raise_error(NoMethodError)
     end
 
     it 'coerces return Hashes to HashWithIndifferentAccess' do
-      expect(MockService.return_a_hash.class).to eq(HashWithIndifferentAccess)
+      expect(MyService.return_a_hash.class).to eq(HashWithIndifferentAccess)
     end
 
     it 'coerces return array of Hashes to array of HashWithIndifferentAccess' do
-      expect(MockService.return_an_array_of_hashes.first.class).to eq(HashWithIndifferentAccess)
+      expect(MyService.return_an_array_of_hashes.first.class).to eq(HashWithIndifferentAccess)
     end
   end
 
   describe 'test mode' do
-    describe 'proxies methods to Test[service_module_name]' do
-      it do
-        expect(MockService.test_mode?).to be_falsy
+    after { MyService.test_mode = false }
 
-        MockService.test_mode = true
-        expect_any_instance_of(TestMockService).to receive(:return_a_hash).once
-        MockService.return_a_hash
-
-        MockService.test_mode = false
-        expect_any_instance_of(MockService).to receive(:return_a_hash).once
-        expect_any_instance_of(TestMockService).not_to receive(:return_a_hash)
-        MockService.return_a_hash
+    describe '#test_mode=' do
+      it 'defaults to false' do
+        expect(MyService.test_mode?).to eq(false)
       end
+
+      it 'allows test_mode to be toggled on' do
+        MyService.test_mode = true
+        expect(MyService.test_mode?).to eq(true)
+      end
+
+      it 'allows test_mode to be toggled off' do
+        MyService.test_mode = true
+        expect(MyService.test_mode?).to eq(true)
+        MyService.test_mode = false
+        expect(MyService.test_mode?).to eq(false)
+      end
+    end
+
+    describe '#test_interface' do
+      it 'returns the registered test interface' do
+        expect(MyService.test_interface).to eq(MyServiceMock)
+      end
+
+      describe 'raises TestInterfaceNotRegistered if a test interface is not registered' do
+        before { MyService.send(:register_test_interface, nil) }
+        after { MyService.send(:register_test_interface, MyServiceMock) }
+
+        it do
+          expect { MyService.test_interface }.to raise_error(NanoService::TestInterfaceNotRegistered)
+        end
+      end
+    end
+
+    it 'proxies methods to Test[service_module_name]' do
+      MyService.test_mode = true
+      expect_any_instance_of(MyServiceMock).to receive(:return_a_hash).once
+      MyService.return_a_hash
     end
   end
 
   describe 'exception handling' do
     it 'passes exception to handle_exception' do
-      allow_any_instance_of(MockService).to receive(:exception!) { raise StandardError }
-      allow(MockService).to receive(:handle_exception) { true }
-      MockService.exception!
+      allow_any_instance_of(MyService).to receive(:exception!) { raise StandardError }
+      allow(MyService).to receive(:handle_exception) { true }
+      MyService.exception!
 
-      expect(MockService).to have_received(:handle_exception).with(StandardError)
+      expect(MyService).to have_received(:handle_exception).with(StandardError)
     end
 
     # allows service to raise NanoService errors directly
     describe 'NanoService exceptions' do
       it 'catches and re-raises any NanoService exceptions' do
-        allow_any_instance_of(MockService).to receive(:exception!) do
+        allow_any_instance_of(MyService).to receive(:exception!) do
           raise NanoService::Error
         end
 
-        expect { MockService.exception! }.to raise_error(NanoService::Error)
+        expect { MyService.exception! }.to raise_error(NanoService::Error)
       end
     end
 
     # dynamically defines NanoService errors within service namespace
     describe 'NanoService exceptions' do
       it 'catches and re-raises any NanoService exceptions' do
-        allow_any_instance_of(MockService).to receive(:exception!) do
-          raise MockService::Error
+        allow_any_instance_of(MyService).to receive(:exception!) do
+          raise MyService::Error
         end
 
-        expect { MockService.exception! }.to raise_error(MockService::Error)
+        expect { MyService.exception! }.to raise_error(MyService::Error)
       end
     end
 
     # re-packages known errors as NanoService errors
     describe 'known exceptions' do
       it 'catches ActiveRecord::RecordNotFound exceptions and returns RecordNotFound' do
-        allow_any_instance_of(MockService).to receive(:exception!) do
+        allow_any_instance_of(MyService).to receive(:exception!) do
           raise ActiveRecord::RecordNotFound
         end
 
-        expect { MockService.exception! }.to raise_error(NanoService::RecordNotFound)
+        expect { MyService.exception! }.to raise_error(NanoService::RecordNotFound)
       end
 
       # TODO: do a better job mocking ActiveRecord errors
       # it 'catches ActiveRecord::RecordInvalid exceptions and returns RecordInvalid' do
-      #   allow_any_instance_of(MockService).to receive(:exception!) do
+      #   allow_any_instance_of(MyService).to receive(:exception!) do
       #     raise ActiveRecord::RecordInvalid, 'foobar'
       #   end
       #
-      #   expect{ MockService.exception! }.to raise_error(NanoService::RecordInvalid)
+      #   expect{ MyService.exception! }.to raise_error(NanoService::RecordInvalid)
       # end
       #
       # it 'catches ActiveRecord::RecordNotSaved exceptions and returns RecordNotSaved' do
-      #   allow_any_instance_of(MockService).to receive(:exception!) do
+      #   allow_any_instance_of(MyService).to receive(:exception!) do
       #     raise ActiveRecord::RecordNotSaved
       #   end
       #
-      #   expect{ MockService.exception! }.to raise_error(NanoService::RecordNotSaved)
+      #   expect{ MyService.exception! }.to raise_error(NanoService::RecordNotSaved)
       # end
 
       it 'catches URI::BadURIError (gid) exceptions and returns InvalidGlobalID' do
-        allow_any_instance_of(MockService).to receive(:exception!) { GlobalID.new('foo') }
+        allow_any_instance_of(MyService).to receive(:exception!) { GlobalID.new('foo') }
 
-        expect { MockService.exception! }.to raise_error(NanoService::InvalidGlobalID)
+        expect { MyService.exception! }.to raise_error(NanoService::InvalidGlobalID)
       end
 
       it 'catches URI::GID::MissingModelIdError exceptions and returns InvalidGlobalID' do
-        allow_any_instance_of(MockService).to receive(:exception!) { GlobalID.new('gid://foo/Bar') }
+        allow_any_instance_of(MyService).to receive(:exception!) { GlobalID.new('gid://foo/Bar') }
 
-        expect { MockService.exception! }.to raise_error(NanoService::InvalidGlobalID)
+        expect { MyService.exception! }.to raise_error(NanoService::InvalidGlobalID)
       end
     end
 
     # re-rasies unknown errors
     describe 'unknown exception' do
       it 'catches StandardError and returns StandardError' do
-        allow_any_instance_of(MockService).to receive(:exception!) { raise StandardError }
+        allow_any_instance_of(MyService).to receive(:exception!) { raise StandardError }
 
-        expect { MockService.exception! }.to raise_error(StandardError)
+        expect { MyService.exception! }.to raise_error(StandardError)
       end
     end
   end
