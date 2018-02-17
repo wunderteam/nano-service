@@ -25,13 +25,6 @@ describe NanoService::Base do
   end
 
   describe '::after' do
-    it 'raises if specified service method is missing' do
-      expect {
-        callback = proc {}
-        MyService.after :echo, :bogus_method, &callback
-      }.to raise_error(/unable to register callback for missing method: bogus_method/)
-    end
-
     it 'registers a proc to be called after the specified service method is invoked' do
       expect do |block|
         MyService.after :echo, :return_a_hash, &block

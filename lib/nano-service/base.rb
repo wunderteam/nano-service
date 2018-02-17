@@ -96,9 +96,6 @@ module NanoService
         method_names.map!(&:to_sym)
         method_names << ANY_METHOD if method_names.empty?
         method_names.each do |method_name|
-          unless instance_methods.include?(method_name) || method_name == ANY_METHOD
-            raise ArgumentError, "unable to register callback for missing method: #{method_name}"
-          end
           (after_callbacks[method_name] ||= []) << block
         end
 
