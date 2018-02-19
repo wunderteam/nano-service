@@ -4,6 +4,10 @@ module MyService
   include NanoService::Base
   register_test_interface MyServiceMock
 
+  def echo(**kwargs)
+    kwargs
+  end
+
   def return_a_hash
     { foo: 'bar' }
   end

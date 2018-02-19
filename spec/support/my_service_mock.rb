@@ -1,4 +1,8 @@
 module MyServiceMock
+  def echo(**kwargs)
+    kwargs
+  end
+
   def return_a_hash
     {}
   end

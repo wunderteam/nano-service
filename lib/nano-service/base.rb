@@ -2,6 +2,9 @@ module NanoService
   module Base
     extend ActiveSupport::Concern
 
+    ANY_METHOD = Object.new
+    private_constant :ANY_METHOD
+
     # dynamically define NanoService exceptions on the including Service module
     included do
       @namespace = Kernel.const_get(name.split('::')[0])
@@ -21,6 +24,11 @@ module NanoService
         if instance_methods.include?(method_name)
           begin
             res = caller_object.send(method_name, *args)
+
+            [method_name, ANY_METHOD].each do |name|
+              after_callbacks.fetch(name, []).each { |c| c.call(method_name, *args) }
+            end
+
             if res.is_a?(Hash)
               res.with_indifferent_access
             elsif res.is_a?(Array)
@@ -34,6 +42,10 @@ module NanoService
         else
           super
         end
+      end
+
+      def respond_to_missing?(method_name, include_private = false)
+        instance_methods.include?(method_name) || super
       end
 
       def handle_exception(e)
@@ -80,7 +92,21 @@ module NanoService
         @test_interface
       end
 
+      def after(*method_names, &block)
+        method_names.map!(&:to_sym)
+        method_names << ANY_METHOD if method_names.empty?
+        method_names.each do |method_name|
+          (after_callbacks[method_name] ||= []) << block
+        end
+
+        nil
+      end
+
       private
+
+      def after_callbacks
+        @after_callbacks ||= { ANY_METHOD => [] }
+      end
 
       def register_test_interface(klass)
         @test_interface = klass
