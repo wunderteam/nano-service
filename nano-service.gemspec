@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.required_ruby_version = ">= #{IO.read(File.expand_path('../.ruby-version', __FILE__)).chomp}"
 
-  s.add_dependency 'activerecord',  '5.1.3'
-  s.add_dependency 'activesupport', '5.1.3'
+  s.add_dependency 'activerecord',  '~> 5.1.3'
+  s.add_dependency 'activesupport', '~> 5.1.3'
   s.add_dependency 'globalid',      '0.4.0'
 end
