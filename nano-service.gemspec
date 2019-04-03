@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'activerecord',  '~> 5.2.3'
   s.add_dependency 'activesupport', '~> 5.2.3'
-  s.add_dependency 'globalid',      '0.4.0'
+  s.add_dependency 'globalid',      '0.4.2'
 end
