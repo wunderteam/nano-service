@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nano-service (0.2.0)
+    nano-service (0.2.1)
       activerecord (~> 5.2.3)
       activesupport (~> 5.2.3)
       globalid (= 0.4.2)
