@@ -9,7 +9,7 @@ jobs:
   rspec:
     parallelism: 1
     docker:
-      - image: circleci/ruby:2.7.2
+      - image: cimg/ruby:2.7.2
         environment:
           TZ: "America/Denver"
           AWS_ACCESS_KEY: foo
