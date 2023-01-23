@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    nano-service (0.2.1)
+    nano-service (0.3.0)
       activerecord (>= 6.0.4, < 7.1.0)
       activesupport (>= 6.0.4, < 7)
       globalid (~> 1.0, >= 1.0.1)
@@ -20,7 +20,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
-    concurrent-ruby (1.1.10)
+    concurrent-ruby (1.2.0)
     diff-lcs (1.5.0)
     globalid (1.0.1)
       activesupport (>= 5.0)
