@@ -1,11 +1,11 @@
-$LOAD_PATH.push File.expand_path('../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 
 require 'nano-service/version'
 
 Gem::Specification.new do |s|
   s.name        = 'nano-service'
   s.version     = NanoService::VERSION
-  s.license     = "MIT"
+  s.license     = 'MIT'
   s.authors     = ['Dave Riess']
   s.email       = ['dave@wundercapital.com']
   s.homepage    = 'https://github.com/wunderteam/nano-service'
@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.require_paths = ['lib']
-  s.required_ruby_version = ">= #{IO.read(File.expand_path('../.ruby-version', __FILE__)).chomp}"
+  s.required_ruby_version = ">= #{IO.read(File.expand_path('.ruby-version', __dir__)).chomp}"
 
   s.add_dependency 'activerecord',  '>= 6.0.4', '< 7.1.0'
-  s.add_dependency 'activesupport', '~> 6.0.4'
+  s.add_dependency 'activesupport', '>= 6.0.4', '< 7'
   s.add_dependency 'globalid',      '~> 1.0', '>= 1.0.1'
 end
