@@ -20,13 +20,13 @@ module NanoService
     end
 
     module ClassMethods
-      def method_missing(method_name, *args, &block)
+      def method_missing(method_name, *args, **kwargs, &block)
         if instance_methods.include?(method_name)
           begin
-            res = caller_object.send(method_name, *args)
+            res = caller_object.send(method_name, *args, **kwargs)
 
             [method_name, ANY_METHOD].each do |name|
-              after_callbacks.fetch(name, []).each { |c| c.call(method_name, *args) }
+              after_callbacks.fetch(name, []).each { |c| c.call(method_name, *args, **kwargs) }
             end
 
             if res.is_a?(Hash)
