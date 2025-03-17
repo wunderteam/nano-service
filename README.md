@@ -3,20 +3,6 @@
 # NanoService Prototype
 A thin module wrapper for helping enforce service boundaries.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'nano-service'
-```
-
-And then execute:
-
-```
-$ bundle install
-```
-
 ## Usage
 
 NanoService provides a simple way to define service modules with consistent error handling, method proxying, and test support.
