@@ -7,6 +7,10 @@ class Fish
   def errors
     @errors ||= ActiveModel::Errors.new(self)
   end
+
+  def read_attribute_for_validation(attr)
+    send(attr)
+  end
 end
 
 describe NanoService::ErrorSerializer do
@@ -15,9 +19,9 @@ describe NanoService::ErrorSerializer do
   let(:model) { Fish.new }
 
   before do
-    model.errors.add(:name, 'is required')
-    model.errors.add(:type, 'is invalid')
-    model.errors.add(:type, 'must be one of (fighting,freshwater)')
+    model.errors.add(:name, message: 'is required')
+    model.errors.add(:type, message: 'is invalid')
+    model.errors.add(:type, message: 'must be one of (fighting,freshwater)')
   end
 
   describe '::serialize' do
